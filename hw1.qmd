@@ -1,6 +1,6 @@
 ---
 title: "Homework 1"
-author: "[Insert your name here]{style='background-color: yellow;'}"
+author: "[Haozhe Shan]{style='background-color: yellow;'}"
 toc: true
 title-block-banner: true
 title-block-style: default
@@ -16,6 +16,9 @@ format: html
 ## Due: Fri, Jan 26, 2024 @ 11:59pm
 
 
+```{R}
+install.packages("renv")
+```
 
 Please read the instructions carefully before submitting your assignment. 
 
@@ -54,6 +57,10 @@ In this question, we will walk through the process of _forking_ a `git` reposito
     $ git clone <<insert your repository url here>>
     $ cd hw-1
     ```
+```{bash}
+  git clone <<https://github.com/BaigeiXimen/hw1.git>>
+  cd hw-1
+```
 
 3. In order to activate the `R` environment for the homework, make sure you have `renv` installed beforehand. To activate the `renv` environment for this assignment, open an instance of the `R` console from within the directory and type
     
@@ -61,6 +68,11 @@ In this question, we will walk through the process of _forking_ a `git` reposito
     renv::activate()
     ```
     Follow the instrutions in order to make sure that `renv` is configured correctly. 
+    
+```{R}
+renv::activate()
+```
+    
 
 4. Work on the _reminaing part_ of this assignment as a `.qmd` file.
 
@@ -106,16 +118,36 @@ For the following questions, provide your answers in a code cell.
 
 1. What data type does the vector contain?
 
-1. Create two new vectors called `my_vec_double` and `my_vec_int` which converts `my_vec` to Double & Integer types, respectively, 
+ character
+ 
+2. Create two new vectors called `my_vec_double` and `my_vec_int` which converts `my_vec` to Double & Integer types, respectively, 
 
-1. Create a new vector `my_vec_bool` which comprises of:
+```{r}
+my_vec_double <- as.double(my_vec) 
+
+my_vec_int <- as.integer(my_vec)
+```
+
+3. Create a new vector `my_vec_bool` which comprises of:
     * ```r TRUE```if an element in `my_vec_double` is $\le 0$
     * ```r FALSE``` if an element in `my_vec_double` is $\ge 0$
 
     How many elements of `my_vec_double` are greater than zero?
 
-1. Sort the values of `my_vec_double` in ascending order. 
+```{R}
+my_vec_bool <- my_vec_double < 0 
 
+sum(my_vec_bool)
+```
+
+
+4. Sort the values of `my_vec_double` in ascending order. 
+
+```{R}
+my_vec_double_sorted <- sort(my_vec_double) 
+
+my_vec_double_sorted
+```
 
 <br><br><br><br>
 <br><br><br><br>
@@ -175,6 +207,25 @@ M <- generate_matrix(50)
 mean(M)
 ```
 
+##answer
+```{R}
+#First matrix
+x=c(1,2,3,4,5,6,7,8,9)
+matrix_1=matrix(x,nrow=3,ncol=3,nyrow=TRUE)
+ matrix_1
+
+
+#Second Matrix
+m=seq(1,100,1)
+m
+n=m^2
+n
+matrix_2=matrix(c(m,n),nrow=2,ncol=100,byrow=TRUE)
+matrix_2
+```
+
+
+
 
 2. Write a function `row_wise_scan` which scans the entries of `M` one row after another and outputs the number of elements whose value is $\ge 0$. You can use the following **starter code**
 
@@ -196,6 +247,34 @@ row_wise_scan <- function(x){
     return(count)
 }
 ```
+```{R}
+generate_matrix=function(n){
+  return(
+    matrix(
+      rnorm(n^2),nrow=n
+    )
+  )
+}
+M=generate_matrix(50)
+mean(M) #checking for the mean of matrix M
+
+
+
+row_wise_scan=function(x){
+  n=nrow(x)
+  m=ncol(x)
+  count=0
+  for(rows in 1:n){
+    for(cols in 1:m){
+      if(x[rows,cols]>=0){
+        count=count+1
+      }
+    }
+  }
+  count
+}
+row_wise_scan(M)
+```
 
 
 3. Similarly, write a function `col_wise_scan` which does exactly the same thing but scans the entries of `M` one column after another
@@ -210,8 +289,29 @@ col_wise_scan <- function(x){
 }
 ```
 You can check if your code is doing what it's supposed to using the function here[^footnote]
+```{R}
+col_wise_scan=function(x){
+  m=ncol(x)
+  n=nrow(x)
+  count=0
+  for(cols in 1:m){
+    for(rows in 1:n){
+      if(x[rows,cols]>=0){
+        count=count+1
+      }
+    }
+  }
+  count
+}
+col_wise_scan(M)
+```
 
 4. Between `col_wise_scan` and `row_wise_scan`, which function do you expect to take shorter to run? Why?
+
+The time taken in row wise scan for the matrix and for the columnn-wisee scan would be equal, as the same operation is done in both of the cases. 
+And the number of row and columns are also same so total time take by both the methods will be the same.
+
+
 
 5. Write a function `time_scan` which takes in a method `f` and a matrix `M` and outputs the amount of time taken to run `f(M)`
 
@@ -236,6 +336,20 @@ list(
 ```
 Which took longer to run? 
 
+```{R}
+time_scan=function(f,m){
+start.time=Sys.time()
+f(m)
+end.time=Sys.time()
+time.taken=round(end.time-start.time)
+time.taken
+}
+
+time_scan(col_wise_scan,M)
+time_scan(row_wise_scan,M)
+```
+
+
 6. Repeat this experiment now when:
     * `M` is a $100 \times 100$ matrix
     * `M` is a $1000 \times 1000$ matrix
@@ -246,6 +360,16 @@ What can you conclude?
 <br><br><br><br>
 <br><br><br><br>
 ---
+```{R}
+M1=generate_matrix(100)
+M2=generate_matrix(1000)
+M3=generate_matrix(5000)
+
+list(row_wise_time=time_scan(row_wise_scan,M1),col_wise_time=time_scan(col_wise_scan,M1))
+list(row_wise_time=time_scan(row_wise_scan,M2),col_wise_time=time_scan(col_wise_scan,M2))
+list(row_wise_time=time_scan(row_wise_scan,M3),col_wise_time=time_scan(col_wise_scan,M3))
+
+```
 
 # Appendix
 
